@@ -1,4 +1,5 @@
-import { rgb2hex } from '../utils/colorConverter'
+export {}
+
 const getVarsBtn = document.getElementById('getVars')
 const desk = document.getElementById('deskForVars')
 const copyVarsBtn = document.getElementById('copyVars')
@@ -16,43 +17,49 @@ const getVarsFromSelection = () => {
 
 getVarsBtn.addEventListener('click', getVarsFromSelection)
 
+// navigator.clipboard is blocked in Figma's plugin iframe, execCommand still works there
 copyVarsBtn.addEventListener('click', () => {
-   var el = document.createElement('textarea');
-   el.value = desk.innerHTML;
-   el.setAttribute('readonly', '');
-   el.setAttribute('style','position: absolute: left: -9999px')
-   document.body.appendChild(el);
-   el.select();
-   document.execCommand('copy');
-   document.body.removeChild(el);
-   copyVarsBtn.textContent = 'Copied!'
-   setTimeout(() => {
-       copyVarsBtn.innerHTML = 'COPY'
-    }, 1000);
+    const el = document.createElement('textarea')
+    el.value = desk.textContent
+    el.setAttribute('readonly', '')
+    el.setAttribute('style', 'position: absolute; left: -9999px')
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+    copyVarsBtn.textContent = 'Copied!'
+    setTimeout(() => {
+        copyVarsBtn.textContent = 'COPY'
+    }, 1000)
 });
 
-onmessage = (e) => {
-    if (e.data.pluginMessage.status === 'selectionEmpty') {
-        textError.innerHTML = 'Select shapes on canvas'
-        setTimeout(() => textError.innerHTML = '', 1500);
-    } else if(e.data.pluginMessage.status === 'selectionPartiallyWrong') {
-        textError.innerHTML = 'Selection has incorrect items'
-        setTimeout(() => textError.innerHTML = '', 1500);
-    } else if (e.data.pluginMessage.status === 'selectionFilled') {
+const showError = (message: string) => {
+    textError.textContent = message
+    setTimeout(() => textError.textContent = '', 1500)
+}
+
+window.addEventListener('message', (e) => {
+    const msg = e.data.pluginMessage
+    if (!msg) {
+        return
+    }
+    if (msg.status === 'selectionEmpty') {
+        showError('Select shapes on canvas')
+    } else if (msg.status === 'selectionPartiallyWrong') {
+        showError('Selection has incorrect items')
+    } else if (msg.status === 'selectionFilled') {
         let varsString = ''
-        e.data.pluginMessage.data.forEach(el => {
-            // let hex = rgb2hex(
-            //     Math.round(el[1].r*255),
-            //     Math.round(el[1].g*255),
-            //     Math.round(el[1].b*255)
-            // )
-            // varsString += `${el[0]}: ${hex};\n`
-            varsString += `${el[0]}: rgba(${(el[1].r*255).toFixed(0)}, ${(el[1].g*255).toFixed(0)}, ${(el[1].b*255).toFixed(0)}, ${el[2].toFixed(2)});\n`
+        msg.data.forEach(el => {
+            const r = Math.round(el[1].r * 255)
+            const g = Math.round(el[1].g * 255)
+            const b = Math.round(el[1].b * 255)
+            const alpha = Number(el[2].toFixed(2))
+            varsString += `${el[0]}: rgba(${r}, ${g}, ${b}, ${alpha});\n`
         });
         desk.textContent = varsString
         copyVarsBtn.setAttribute('style', 'display:block')
     }
-}
+})
 
 clearVarsBtn.addEventListener('click', ()=> {
     desk.textContent = ''

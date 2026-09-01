@@ -1,40 +1,35 @@
-export const hex2rgb = hex => {
-  const match = hex.toString(16).match(/[a-f0-9]{6}|[a-f0-9]{3}/i);
+// "#RGB" / "#RRGGBB" / "#RRGGBBAA" → [r, g, b] or [r, g, b, alpha]
+// with channels in [0, 1]; null if the string is not a hex color
+export const hex2rgb = (hex: string): number[] | null => {
+  const match = hex.match(/[a-f0-9]{8}|[a-f0-9]{6}|[a-f0-9]{3}/i);
   if (!match) {
-    return [0, 0, 0];
+    return null;
   }
   let colorString = match[0];
-  if (match[0].length === 3) {
+  if (colorString.length === 3) {
     colorString = colorString
       .split("")
-      .map(char => {
-        return char + char;
-      })
+      .map(char => char + char)
       .join("");
   }
-  const integer = parseInt(colorString, 16);
+  const integer = parseInt(colorString.substring(0, 6), 16);
   const r = (integer >> 16) & 0xff;
   const g = (integer >> 8) & 0xff;
   const b = integer & 0xff;
-  return [r / 255, g / 255, b / 255];
+  const rgb = [r / 255, g / 255, b / 255];
+  if (colorString.length === 8) {
+    const alpha = parseInt(colorString.substring(6, 8), 16) / 255;
+    return [...rgb, Math.round(alpha * 100) / 100];
+  }
+  return rgb;
 };
 
-// const hexToRgb = hex =>
-//   hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
-//              ,(m, r, g, b) => '#' + r + r + g + g + b + b)
-//     .substring(1).match(/.{2}/g)
-//     .map(x => parseInt(x, 16))
-// console.log(hexToRgb("#0033ff")) // [0, 51, 255]
-// console.log(hexToRgb("#03f")) // [0, 51, 255]
-
+// input: r,g,b in [0,1]; output: [h in [0,360], s in [0,100], l in [0,100]]
 export const rgb2hsl = (r: number, g: number, b: number) => {
-  // const r = rgb[0] / 255;
-  // const g = rgb[1] / 255;
-  // const b = rgb[2] / 255;
   const min = Math.min(r, g, b);
   const max = Math.max(r, g, b);
   const delta = max - min;
-  let h: number;
+  let h = 0;
   let s: number;
 
   if (max === min) {
@@ -63,11 +58,7 @@ export const rgb2hsl = (r: number, g: number, b: number) => {
     s = delta / (2 - max - min);
   }
 
-  return [
-    Math.ceil(parseFloat(h.toFixed(2))),
-    Math.ceil(parseFloat((s * 100).toFixed(2))),
-    Math.ceil(parseFloat((l * 100).toFixed(2)))
-  ];
+  return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
 };
 
 export const rgb2hex = (r: number, g: number, b: number) =>
@@ -76,12 +67,10 @@ export const rgb2hex = (r: number, g: number, b: number) =>
       return hex.length === 1 ? "0" + hex : hex;
   }).join("");
 
-  
-// input: h in [0,360] and s,v in [0,1]
-// output: r,g,b in [0,1]
-export const hsl2rgb = (h:number, s:number, l:number) => {
-  let a = s * Math.min(l, 1 - l);
-  let f = (n, k = (n + h / 30) % 12) =>
+// input: h in [0,360], s and l in [0,1]; output: r,g,b in [0,1]
+export const hsl2rgb = (h: number, s: number, l: number) => {
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number, k = (n + h / 30) % 12) =>
     l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
   return [f(0), f(8), f(4)];
 };

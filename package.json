@@ -1,12 +1,12 @@
 {
   "name": "vars2colors",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Figma plugin to draw color items from css color variables for UI-kits and libraries",
   "main": "code.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx webpack --mode=development --watch",
-    "build": "npx webpack --mode=production"
+    "start": "NODE_OPTIONS=--openssl-legacy-provider npx webpack --mode=development --watch",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider npx webpack --mode=production"
   },
   "repository": {
     "type": "git",

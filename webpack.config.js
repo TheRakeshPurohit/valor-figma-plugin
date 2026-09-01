@@ -1,6 +1,7 @@
 const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSVGPlugin = require("html-webpack-inline-svg-plugin");
+const webpack = require("webpack");
 const path = require("path");
 
 module.exports = (env, argv) => ({
@@ -38,6 +39,9 @@ module.exports = (env, argv) => ({
 
   // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
   plugins: [
+    new webpack.DefinePlugin({
+      APP_VERSION: JSON.stringify(require("./package.json").version)
+    }),
     new HtmlWebpackPlugin({
       template: "./src/ui.html",
       filename: "ui.html",

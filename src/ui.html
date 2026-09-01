@@ -1,6 +1,6 @@
 <div class="layout-divider_bottom">
   <div class="layout">
-    <span class="header">
+    <div class="header">
       <div class="header_logo">
         <img inline src="src/img/logo.svg" />
       </div>
@@ -8,26 +8,26 @@
         <div class="header_mode-switcher">
           <input
             type="radio"
-            name="radioButton"
+            name="mode"
             value="showV2C"
             id="checkboxV2C"
             checked
           />
-          <label for="showV2C" class="header_showV2C tabs tabs_active">
+          <label for="checkboxV2C" class="header_showV2C tabs tabs_active">
             <div class="">Draw components</div>
           </label>
 
           <input
             type="radio"
-            name="radioButton"
+            name="mode"
             value="showC2V"
             id="checkboxC2V"
           />
-          <label for="showC2V" class="header_showC2V tabs">
+          <label for="checkboxC2V" class="header_showC2V tabs">
             <div class="">Generate variables</div>
           </label>
         </div>
-        <span style='font-size:11px; line-height:16px; opacity: .3'>v1.3.2</span>
+        <span id="appVersion" style='font-size:11px; line-height:16px; opacity: .3'></span>
       </div>
     </div>
   </div>
@@ -68,7 +68,7 @@
     <div class="render-style">
       <input
         type="radio"
-        name="radioButton"
+        name="renderStyle"
         value="circle"
         id="circle"
         checked
@@ -76,7 +76,7 @@
       <label for="circle" class="render-style_draw">
         <img inline src="src/img/draw-circle.svg" />
       </label>
-      <input type="radio" name="radioButton" value="rectangle" id="rectangle" />
+      <input type="radio" name="renderStyle" value="rectangle" id="rectangle" />
       <label class="render-style_draw" for="rectangle">
         <img inline src="src/img/draw-rectangle.svg" />
       </label>
@@ -108,9 +108,11 @@
             <img inline src="src/img/icon-question.svg" />
             <span
               >Select shapes on a canvas to generate variables list.
-              <li>Rectangle or ellipse are supported</li>
-              <li>Shapes must be ungrouped</li>
-              <li>Shape's name will be passed to variable name</li></span
+              <ul style="margin: 4px 0 0; padding-left: 16px">
+                <li>Rectangle or ellipse are supported</li>
+                <li>Shapes must be ungrouped</li>
+                <li>Shape's name will be passed to variable name</li>
+              </ul></span
             >
           </div>
         </div>
